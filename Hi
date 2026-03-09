@@ -1,1 +1,305 @@
 
+local player = game.Players.LocalPlayer
+local gui = player:WaitForChild("PlayerGui")
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "KhungAnhKhongChu"
+screenGui.Parent = gui
+screenGui.IgnoreGuiInset = true
+screenGui.ResetOnSpawn = false
+local sound = Instance.new("Sound")
+sound.Name = "BackgroundMusic"
+sound.SoundId = "rbxassetid://110919391228823"
+sound.Volume = 0.5
+sound.Looped = true
+sound.Parent = screenGui
+local isPlaying = true
+sound:Play()
+
+local songList = {
+    "rbxassetid://110919391228823",
+    "rbxassetid://9120387465",
+    "rbxassetid://1843383199",
+    "rbxassetid://142598548",
+    "rbxassetid://160413567"
+}
+local currentSongIndex = 1
+
+local function getSongNameFromId(soundId)
+    local id = soundId:match("%d+")
+    if id then
+        local success, result = pcall(function()
+            return game:GetService("MarketplaceService"):GetProductInfo(tonumber(id))
+        end)
+        if success and result then
+            return result.Name
+        end
+    end
+    return "Âm nhạc"
+end
+local songName = getSongNameFromId(sound.SoundId)
+local frame = Instance.new("Frame")
+frame.Name = "MainFrame"
+frame.Size = UDim2.new(0, 400, 0, 150)
+frame.Position = UDim2.new(0.5, -200, 0.5, -75)
+frame.BackgroundTransparency = 1
+frame.ClipsDescendants = true
+frame.Parent = screenGui
+local stroke = Instance.new("UIStroke")
+stroke.Color = Color3.fromRGB(255, 255, 255)
+stroke.Thickness = 1.5
+stroke.Parent = frame
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 15)
+corner.Parent = frame
+local imageLabel = Instance.new("ImageLabel")
+imageLabel.Name = "BackgroundImage"
+imageLabel.Size = UDim2.new(1, 0, 1, 0)
+imageLabel.BackgroundTransparency = 1
+imageLabel.Image = "rbxassetid://123427419242741"
+imageLabel.ScaleType = Enum.ScaleType.Crop
+imageLabel.Parent = frame
+local imageCorner = Instance.new("UICorner")
+imageCorner.CornerRadius = UDim.new(0, 15)
+imageCorner.Parent = imageLabel
+local icon = Instance.new("ImageLabel")
+icon.Name = "Icon"
+icon.Size = UDim2.new(0, 16, 0, 16)
+icon.Position = UDim2.new(0, 10, 0, 10)
+icon.BackgroundTransparency = 1
+icon.Image = "rbxassetid://76571437829227"
+icon.ScaleType = Enum.ScaleType.Fit
+icon.Parent = frame
+local volumeText = Instance.new("TextLabel")
+volumeText.Name = "VolumeText"
+volumeText.Size = UDim2.new(0, 130, 0, 20)
+volumeText.Position = UDim2.new(0, 30, 0, 8)
+volumeText.BackgroundTransparency = 1
+volumeText.Text = "Âm lượng Roblox"
+volumeText.TextColor3 = Color3.fromRGB(255, 255, 255)
+volumeText.TextSize = 14
+volumeText.Font = Enum.Font.SourceSansLight
+volumeText.TextStrokeTransparency = 0.3
+volumeText.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+volumeText.TextXAlignment = Enum.TextXAlignment.Left
+volumeText.Parent = frame
+local musicText = Instance.new("TextLabel")
+musicText.Name = "MusicText"
+musicText.Size = UDim2.new(0.9, 0, 0, 28)
+musicText.Position = UDim2.new(0.05, 0, 0.2, 0)
+musicText.BackgroundTransparency = 1
+musicText.Text = songName
+musicText.TextColor3 = Color3.fromRGB(255, 255, 255)
+musicText.TextSize = 20
+musicText.Font = Enum.Font.SourceSansBold
+musicText.TextStrokeTransparency = 0.3
+musicText.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+musicText.TextXAlignment = Enum.TextXAlignment.Center
+musicText.TextYAlignment = Enum.TextYAlignment.Center
+musicText.TextTruncate = Enum.TextTruncate.AtEnd
+musicText.Parent = frame
+local startTimeLabel = Instance.new("TextLabel")
+startTimeLabel.Name = "StartTime"
+startTimeLabel.Size = UDim2.new(0, 40, 0, 20)
+startTimeLabel.Position = UDim2.new(0, 10, 0.45, 0)
+startTimeLabel.BackgroundTransparency = 1
+startTimeLabel.Text = "0:00"
+startTimeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+startTimeLabel.TextSize = 12
+startTimeLabel.Font = Enum.Font.SourceSans
+startTimeLabel.TextStrokeTransparency = 0.3
+startTimeLabel.TextXAlignment = Enum.TextXAlignment.Left
+startTimeLabel.Parent = frame
+local endTimeLabel = Instance.new("TextLabel")
+endTimeLabel.Name = "EndTime"
+endTimeLabel.Size = UDim2.new(0, 40, 0, 20)
+endTimeLabel.Position = UDim2.new(1, -50, 0.45, 0)
+endTimeLabel.BackgroundTransparency = 1
+endTimeLabel.Text = "0:00"
+endTimeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+endTimeLabel.TextSize = 12
+endTimeLabel.Font = Enum.Font.SourceSans
+endTimeLabel.TextStrokeTransparency = 0.3
+endTimeLabel.TextXAlignment = Enum.TextXAlignment.Right
+endTimeLabel.Parent = frame
+local timeFrame = Instance.new("Frame")
+timeFrame.Name = "TimeFrame"
+timeFrame.Size = UDim2.new(0.7, 0, 0, 6)
+timeFrame.Position = UDim2.new(0.15, 0, 0.5, 0)
+timeFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+timeFrame.BackgroundTransparency = 0.3
+timeFrame.Parent = frame
+local progressBar = Instance.new("Frame")
+progressBar.Name = "ProgressBar"
+progressBar.Size = UDim2.new(0, 0, 1, 0)
+progressBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+progressBar.Parent = timeFrame
+local timeCorner = Instance.new("UICorner")
+timeCorner.CornerRadius = UDim.new(1, 0)
+timeCorner.Parent = timeFrame
+local progressCorner = Instance.new("UICorner")
+progressCorner.CornerRadius = UDim.new(1, 0)
+progressCorner.Parent = progressBar
+local seekButton = Instance.new("ImageButton")
+seekButton.Name = "SeekButton"
+seekButton.Size = UDim2.new(1, 0, 3, 0)
+seekButton.Position = UDim2.new(0, 0, 0.5, -10)
+seekButton.BackgroundTransparency = 1
+seekButton.Parent = timeFrame
+
+local controlFrame = Instance.new("Frame")
+controlFrame.Name = "ControlFrame"
+controlFrame.Size = UDim2.new(0.9, 0, 0, 40)
+controlFrame.Position = UDim2.new(0.05, 0, 0.65, 0)
+controlFrame.BackgroundTransparency = 1
+controlFrame.Parent = frame
+
+local prevButton = Instance.new("ImageButton")
+prevButton.Name = "PreviousMusic"
+prevButton.Size = UDim2.new(0, 36, 0, 36)
+prevButton.Position = UDim2.new(0.25, -18, 0, 2)
+prevButton.BackgroundTransparency = 1
+prevButton.Image = "rbxassetid://10734972621"
+prevButton.ImageColor3 = Color3.fromRGB(255, 255, 255)
+prevButton.ScaleType = Enum.ScaleType.Fit
+prevButton.Rotation = 180
+prevButton.Parent = controlFrame
+local prevCorner = Instance.new("UICorner")
+prevCorner.CornerRadius = UDim.new(0, 8)
+prevCorner.Parent = prevButton
+local prevStroke = Instance.new("UIStroke")
+prevStroke.Color = Color3.fromRGB(255, 255, 255)
+prevStroke.Thickness = 1.5
+prevStroke.Parent = prevButton
+
+local toggleButton = Instance.new("ImageButton")
+toggleButton.Name = "ToggleMusic"
+toggleButton.Size = UDim2.new(0, 36, 0, 36)
+toggleButton.Position = UDim2.new(0.5, -18, 0, 2)
+toggleButton.BackgroundTransparency = 1
+toggleButton.Image = "rbxassetid://10734923549"
+toggleButton.ScaleType = Enum.ScaleType.Fit
+toggleButton.Parent = controlFrame
+local toggleCorner = Instance.new("UICorner")
+toggleCorner.CornerRadius = UDim.new(0, 8)
+toggleCorner.Parent = toggleButton
+local toggleStroke = Instance.new("UIStroke")
+toggleStroke.Color = Color3.fromRGB(255, 255, 255)
+toggleStroke.Thickness = 1.5
+toggleStroke.Parent = toggleButton
+
+local nextButton = Instance.new("ImageButton")
+nextButton.Name = "NextMusic"
+nextButton.Size = UDim2.new(0, 36, 0, 36)
+nextButton.Position = UDim2.new(0.75, -18, 0, 2)
+nextButton.BackgroundTransparency = 1
+nextButton.Image = "rbxassetid://10734972621"
+nextButton.ImageColor3 = Color3.fromRGB(255, 255, 255)
+nextButton.ScaleType = Enum.ScaleType.Fit
+nextButton.Parent = controlFrame
+local nextCorner = Instance.new("UICorner")
+nextCorner.CornerRadius = UDim.new(0, 8)
+nextCorner.Parent = nextButton
+local nextStroke = Instance.new("UIStroke")
+nextStroke.Color = Color3.fromRGB(255, 255, 255)
+nextStroke.Thickness = 1.5
+nextStroke.Parent = nextButton
+
+local isDragging = false
+local totalTime = 0
+
+local function updateSongInfo()
+    songName = getSongNameFromId(sound.SoundId)
+    musicText.Text = songName
+end
+
+local function playSong(index)
+    if index < 1 then
+        index = #songList
+    elseif index > #songList then
+        index = 1
+    end
+    currentSongIndex = index
+    sound.SoundId = songList[currentSongIndex]
+    sound:Play()
+    isPlaying = true
+    toggleButton.Image = "rbxassetid://10734923549"
+    updateSongInfo()
+end
+
+local function formatTime(seconds)
+    seconds = math.floor(seconds)
+    return string.format("%d:%02d", math.floor(seconds/60), seconds%60)
+end
+local function updateProgress()
+    if sound.TimeLength > 0 then
+        totalTime = sound.TimeLength
+        endTimeLabel.Text = formatTime(totalTime)
+        if not isDragging then
+            local progress = sound.TimePosition / totalTime
+            progressBar.Size = UDim2.new(progress, 0, 1, 0)
+            startTimeLabel.Text = formatTime(sound.TimePosition)
+        end
+    end
+end
+game:GetService("RunService").RenderStepped:Connect(updateProgress)
+local function seekToMouse(input)
+    local relativeX = math.clamp(input.Position.X - timeFrame.AbsolutePosition.X, 0, timeFrame.AbsoluteSize.X)
+    local seekPercent = relativeX / timeFrame.AbsoluteSize.X
+    progressBar.Size = UDim2.new(seekPercent, 0, 1, 0)
+    if totalTime > 0 then
+        startTimeLabel.Text = formatTime(seekPercent * totalTime)
+    end
+end
+seekButton.MouseButton1Down:Connect(function()
+    isDragging = true
+    local moveConnection = game:GetService("UserInputService").InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            seekToMouse(input)
+        end
+    end)
+    local releaseConnection = game:GetService("UserInputService").InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            isDragging = false
+            if sound.TimeLength > 0 then
+                sound.TimePosition = progressBar.Size.X.Scale * sound.TimeLength
+            end
+            moveConnection:Disconnect()
+            releaseConnection:Disconnect()
+        end
+    end)
+end)
+seekButton.MouseButton1Click:Connect(function(input)
+    seekToMouse(input)
+    if sound.TimeLength > 0 then
+        sound.TimePosition = progressBar.Size.X.Scale * sound.TimeLength
+    end
+end)
+sound.Ended:Connect(function()
+    if not sound.Looped then
+        playSong(currentSongIndex + 1)
+    end
+end)
+toggleButton.MouseButton1Click:Connect(function()
+    if isPlaying then
+        sound:Pause()
+        toggleButton.Image = "rbxassetid://10734972621"
+    else
+        sound:Play()
+        toggleButton.Image = "rbxassetid://10734923549"
+    end
+    isPlaying = not isPlaying
+end)
+
+prevButton.MouseButton1Click:Connect(function()
+    playSong(currentSongIndex - 1)
+end)
+
+nextButton.MouseButton1Click:Connect(function()
+    playSong(currentSongIndex + 1)
+end)
+
+game:BindToClose(function()
+    if sound then
+        sound:Stop()
+    end
+end)
